@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spin & Win</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#100b32,#24105b);
+  color: white;
+  text-align: center;
+}
+header {
+  padding: 22px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffd700;
+}
+.card {
+  background: #21164a;
+  margin: 15px;
+  padding: 22px;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px #0005;
+}
+.wallet {
+  font-size: 23px;
+  color: #ffd700;
+}
+.wheel-box {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 25px auto;
+}
+.pointer {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  font-size: 30px;
+  color: white;
+}
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 8px solid #ffd700;
+  background: conic-gradient(
+    #ff4757 0deg 45deg,
+    #ffa502 45deg 90deg,
+    #2ed573 90deg 135deg,
+    #1e90ff 135deg 180deg,
+    #a55eea 180deg 225deg,
+    #ff6348 225deg 270deg,
+    #eccc68 270deg 315deg,
+    #20bf6b 315deg 360deg
+  );
+  transition: transform 4s cubic-bezier(.15,.7,.15,1);
+  box-shadow: 0 0 25px #ffd70077;
+}
+.spin-btn {
+  background: linear-gradient(90deg,#ffd700,#ff8c00);
+  color: #24105b;
+  border: none;
+  padding: 16px 55px;
+  font-size: 21px;
+  font-weight: bold;
+  border-radius: 40px;
+  cursor: pointer;
+}
+.spin-btn:disabled {
+  opacity: .5;
+}
+.info {
+  color: #ddd;
+  font-size: 14px;
+}
+button:active {
+  transform: scale(.97);
+}
+</style>
+</head>
+
+<body>
+
+<header>🎡 SPIN & WIN</header>
+
+<div class="card">
+  <h2>🪙 Your Coin Wallet</h2>
+  <div class="wallet">
+    <span id="coins">0</span> Coins
+  </div>
+</div>
+
+<div class="card">
+  <h2>Try Your Luck!</h2>
+
+  <div class="wheel-box">
+    <div class="pointer">▼</div>
+    <div class="wheel" id="wheel"></div>
+  </div>
+
+  <button class="spin-btn" id="spinBtn" onclick="spin()">
+    SPIN NOW
+  </button>
+
+  <h3 id="result">Good Luck! 🍀</h3>
+  <p class="info">Enjoy your free spin!</p>
+</div>
+
+<div class="card">
+  <h2>🎁 Daily Bonus</h2>
+  <p>Collect 20 free coins every day.</p>
+  <button class="spin-btn" onclick="dailyBonus()">
+    CLAIM BONUS
+  </button>
+</div>
+
+<div class="card">
+  <h3>🏆 Rewards</h3>
+  <p>Collect virtual coins and enjoy the game.</p>
+  <p class="info">Coins are virtual and have no cash value.</p>
+</div>
+
+<script>
+let coins = Number(localStorage.getItem("coins")) || 0;
+let rotation = 0;
+let busy = false;
+
+const prizes = [10,20,30,50,100,15,25,40];
+
+function updateCoins() {
+  document.getElementById("coins").innerText = coins;
+  localStorage.setItem("coins", coins);
+}
+
+function spin() {
+  if (busy) return;
+
+  busy = true;
+  const btn = document.getElementById("spinBtn");
+  btn.disabled = true;
+
+  const prizeIndex = Math.floor(Math.random() * prizes.length);
+  const prize = prizes[prizeIndex];
+
+  rotation += 1800 + (360 - prizeIndex * 45 - 22.5);
+  document.getElementById("wheel").style.transform =
+    `rotate(${rotation}deg)`;
+
+  document.getElementById("result").innerText =
+    "Spinning... 🎡";
+
+  setTimeout(() => {
+    coins += prize;
+    updateCoins();
+
+    document.getElementById("result").innerText =
+      "🎉 You won " + prize + " Coins!";
+
+    busy = false;
+    btn.disabled = false;
+  }, 4100);
+}
+
+function dailyBonus() {
+  const today = new Date().toDateString();
+  const last = localStorage.getItem("bonusDate");
+
+  if (last === today) {
+    alert("You have already claimed today's bonus!");
+    return;
+  }
+
+  coins += 20;
+  localStorage.setItem("bonusDate", today);
+  updateCoins();
+  alert("Congratulations! You received 20 coins!");
+}
+
+updateCoins();
+</script>
+
+</body>
+</html>
